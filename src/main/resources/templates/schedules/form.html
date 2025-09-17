@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create / Update Schedule</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 th:text="${isNew ? 'Create Schedule' : 'Update Schedule'}"></h2>
+
+    <!-- Form Create -->
+    <form th:if="${isNew}" th:action="@{/schedules/create}" th:object="${schedule}" method="post">
+        <!-- Name -->
+        <div class="mb-3">
+            <label class="form-label">Schedule Name</label>
+            <input type="text" th:field="*{name}" class="form-control" placeholder="Nhập tên lịch gửi"/>
+        </div>
+
+        <!-- Type -->
+        <div class="mb-3">
+            <label class="form-label">Type</label>
+            <select th:field="*{type}" th:id="'typeSelect-' + ${schedule.id}" class="form-control typeSelect">
+                <option value="DAILY">Daily</option>
+                <option value="WEEKLY">Weekly</option>
+                <option value="MONTHLY">Monthly</option>
+                <option value="CRON">Cron (Custom)</option>
+            </select>
+        </div>
+
+        <!-- Custom Cron -->
+        <div th:id="'cronField-' + ${schedule.id}" class="mb-3 d-none cronField">
+            <label class="form-label">Custom Cron</label>
+            <input type="text" th:field="*{cronExpression}" placeholder="0 0 9 * * ?" class="form-control"/>
+        </div>
+
+        <!-- Recipient -->
+        <div class="mb-3">
+            <label class="form-label">Recipient Email</label>
+            <input type="email" th:field="*{receiverEmail}" class="form-control" placeholder="example@gmail.com"/>
+        </div>
+
+        <!-- Template -->
+        <div class="mb-3">
+            <label class="form-label">Template</label>
+            <select th:field="*{template}" class="form-control">
+                <option value="" disabled selected>-- Chọn template --</option>
+                <option th:each="t : ${emailTemplates}" th:value="${t.id}" th:text="${t.name}"></option>
+            </select>
+        </div>
+
+        <!-- Buttons -->
+        <button type="submit" class="btn btn-success">Save</button>
+        <a th:href="@{/schedules/list?page=0&size=5}" class="btn btn-secondary">Cancel</a>
+
+    </form>
+
+    <!-- Form Update -->
+    <form th:if="${!isNew}" th:action="@{'/schedules/update/' + ${schedule.id}}" th:object="${schedule}" method="post">
+        <!-- Name -->
+        <div class="mb-3">
+            <label class="form-label">Schedule Name</label>
+            <input type="text" th:field="*{name}" class="form-control" placeholder="Nhập tên lịch gửi"/>
+        </div>
+
+        <!-- Type -->
+        <div class="mb-3">
+            <label class="form-label">Type</label>
+            <select th:field="*{type}" th:id="'typeSelect-' + ${schedule.id}" class="form-control typeSelect">
+                <option value="DAILY">Daily</option>
+                <option value="WEEKLY">Weekly</option>
+                <option value="MONTHLY">Monthly</option>
+                <option value="CRON">Cron (Custom)</option>
+            </select>
+        </div>
+
+        <!-- Custom Cron -->
+        <div th:id="'cronField-' + ${schedule.id}" class="mb-3 d-none cronField">
+            <label class="form-label">Custom Cron</label>
+            <input type="text" th:field="*{cronExpression}" placeholder="0 0 9 * * ?" class="form-control"/>
+        </div>
+
+        <!-- Recipient -->
+        <div class="mb-3">
+            <label class="form-label">Recipient Email</label>
+            <input type="email" th:field="*{receiverEmail}" class="form-control" placeholder="example@gmail.com"/>
+        </div>
+
+        <!-- Template -->
+        <div class="mb-3">
+            <label class="form-label">Template</label>
+            <select th:field="*{template}" class="form-control">
+                <option value="" disabled selected>-- Chọn template --</option>
+                <option th:each="t : ${emailTemplates}" th:value="${t.id}" th:text="${t.name}"></option>
+            </select>
+        </div>
+
+        <!-- Buttons -->
+        <button type="submit" class="btn btn-success">Save</button>
+        <a th:href="@{/schedules/list?page=0&size=5}" class="btn btn-secondary">Cancel</a>
+    </form>
+
+
+</div>
+
+<script>
+    // Hiển thị/ẩn cronField tương ứng từng select
+    document.querySelectorAll('.typeSelect').forEach(select => {
+        const idSuffix = select.id.split('-')[1];
+        const cronDiv = document.getElementById('cronField-' + idSuffix);
+
+        // Hiển thị cron nếu value = CRON khi load trang (update)
+        if (select.value === 'CRON') {
+            cronDiv.classList.remove('d-none');
+        }
+
+        select.addEventListener('change', function () {
+            if (this.value === 'CRON') {
+                cronDiv.classList.remove('d-none');
+            } else {
+                cronDiv.classList.add('d-none');
+            }
+        });
+    });
+</script>
+</body>
+</html>
